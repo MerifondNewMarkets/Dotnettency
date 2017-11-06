@@ -21,7 +21,7 @@ namespace Dotnettency.Container
 
             if (role == ContainerRole.Root)
             {
-                  _logger.LogDebug("Root Container Adaptor Created: {id}, {containerNAme}, {role}", _id, _container.Name, _container.Role);
+                _logger.LogDebug("Root Container Adaptor Created: {id}, {containerNAme}, {role}", _id, _container.Name, _container.Role);
             }
             else
             {
@@ -42,6 +42,12 @@ namespace Dotnettency.Container
                 configure(services);
                 _.Populate(services);
             });
+        }
+
+        public void Configure(Action<ConfigurationExpression> configure)
+        {
+            _logger.LogDebug("Configuring container: {id}, {containerNAme}, {role}", _id, _container.Name, _container.Role);
+            _container.Configure(configure);
         }
 
         public ITenantContainerAdaptor CreateNestedContainer()

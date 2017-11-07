@@ -50,15 +50,39 @@ namespace Dotnettency.Container
             _container.Configure(configure);
         }
 
-        public ITenantContainerAdaptor CreateNestedContainer()
+        /// <summary>
+        /// Builds a request container based on the current container
+        /// </summary>
+        /// <returns></returns>
+        public ITenantContainerAdaptor CreateNestedContainer(bool isRequestContainer = false)
         {
             _logger.LogDebug("Creating nested container from container: {id}, {containerNAme}, {role}", _id, _container.Name, _container.Role);
-            return new StructureMapTenantContainerAdaptor(_logger, _container.GetNestedContainer(), ContainerRole.Scoped);
+
+            var nestedContainer = _container.GetNestedContainer();
+
+            if (isRequestContainer)
+            {
+                var requestContainerConfigurators = _container.GetAllInstances<IStructureMapRequestContainerConfigurator>();
+                if (requestContainerConfigurators != null)
+                {
+                    foreach (var configurator in requestContainerConfigurators)
+                    {
+                        nestedContainer.Configure(configurator.ConfigureRequestContainer);
+                    }
+                }
+            }
+
+            return new StructureMapTenantContainerAdaptor(_logger, nestedContainer, ContainerRole.Scoped);
         }
 
+        /// <summary>
+        /// Builds a tenant container based on the current container
+        /// </summary>
+        /// <returns></returns>
         public ITenantContainerAdaptor CreateChildContainer()
         {
             _logger.LogDebug("Creating child container from container: {id}, {containerNAme}, {role}", _id, _container.Name, _container.Role);
+            
             return new StructureMapTenantContainerAdaptor(_logger, _container.CreateChildContainer(), ContainerRole.Child);
         }
 

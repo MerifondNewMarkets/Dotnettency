@@ -12,11 +12,17 @@ namespace Dotnettency.Container
 
             ContainerBuilderOptions.Builder.ServiceProviderFactory = new Func<IServiceProvider>(() =>
             {
-                return HostContainerAdaptorFactory();
+                var builtContainer = HostContainerAdaptorFactory();
+
+                OnHostContainerBuilt?.Invoke(builtContainer);
+
+                return builtContainer;
             });
         }
 
         public ContainerBuilderOptions<TTenant> ContainerBuilderOptions { get; set; }
         public Func<ITenantContainerAdaptor> HostContainerAdaptorFactory { get; set; }
+        public Action<IServiceProvider> OnHostContainerBuilt { get; set; }
+        public Action<TTenant, IServiceProvider> OnTenantContainerBuilt { get; set; }
     }
 }

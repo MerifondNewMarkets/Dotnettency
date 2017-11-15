@@ -15,7 +15,8 @@ namespace Dotnettency.Container
 
         public async Task<ITenantContainerAdaptor> Get(TTenant currentTenant)
         {
-            return await BuildContainer(currentTenant);
+            var builtContainer = await BuildContainer(currentTenant);
+            return builtContainer;
         }
 
         protected abstract Task<ITenantContainerAdaptor> BuildContainer(TTenant currentTenant);

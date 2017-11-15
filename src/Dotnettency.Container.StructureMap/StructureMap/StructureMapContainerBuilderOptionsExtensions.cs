@@ -1,6 +1,8 @@
 ﻿using Dotnettency.Container;
 using Dotnettency.Container.StructureMap;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using StructureMap;
 using System;
 
 namespace Dotnettency
@@ -29,12 +31,14 @@ namespace Dotnettency
             });
 
             var adapted = new AdaptedContainerBuilderOptions<TTenant>(options, adaptorFactory);
+
+            options.Builder.Services.TryAddScoped((_) => adapted);
             
             return adapted;
         }
 
         public static AdaptedContainerBuilderOptions<TTenant> WithStructureMap<TTenant>(this ContainerBuilderOptions<TTenant> options,
-            Action<TTenant, StructureMap.ConfigurationExpression> configureTenant)
+            Action<TTenant, ConfigurationExpression> configureTenant)
             where TTenant : class
         {
             var adaptorFactory = new Func<ITenantContainerAdaptor>(() =>
@@ -42,6 +46,16 @@ namespace Dotnettency
                 // host level container.
                 var container = new StructureMap.Container();
                 container.Populate(options.Builder.Services);
+
+                var hostContainerConfigurators = container.GetAllInstances<IStructureMapHostContainerConfigurator>();
+                if (hostContainerConfigurators != null)
+                {
+                    foreach (var configurator in hostContainerConfigurators)
+                    {
+                        container.Configure(configurator.ConfigureHostContainer);
+                    }
+                }
+                
                 var adaptedContainer = container.GetInstance<ITenantContainerAdaptor>();
                 // add ITenantContainerBuilder<TTenant> service to the host container
                 // This service can be used to build a child container (adaptor) for a particular tenant, when required.
@@ -55,6 +69,8 @@ namespace Dotnettency
             });
 
             var adapted = new AdaptedContainerBuilderOptions<TTenant>(options, adaptorFactory);
+
+            options.Builder.Services.TryAddScoped((_) => adapted);
 
             return adapted;
         }

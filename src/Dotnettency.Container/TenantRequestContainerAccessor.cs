@@ -25,7 +25,7 @@ namespace Dotnettency.Container
                     return null;
                 }
 
-                var requestContainer = tenantContainer.CreateNestedContainer();
+                var requestContainer = tenantContainer.CreateNestedContainer(true);
                 return new PerRequestContainer(requestContainer);
             });
         }

@@ -5,21 +5,26 @@ using System.Threading.Tasks;
 namespace Dotnettency.Container
 {
     public class TenantContainerBuilderFactory<TTenant> : TenantContainerFactory<TTenant>
-     where TTenant : class
+        where TTenant : class
     {
-
         private readonly IServiceProvider _serviceProvider;
 
-        public TenantContainerBuilderFactory(IServiceProvider servicePrvider)
-            : base(servicePrvider)
+        public TenantContainerBuilderFactory(IServiceProvider serviceProvider) : base(serviceProvider)
         {
-            _serviceProvider = servicePrvider;
+            _serviceProvider = serviceProvider;
         }
 
         protected override async Task<ITenantContainerAdaptor> BuildContainer(TTenant currentTenant)
         {
             var builder = _serviceProvider.GetRequiredService<ITenantContainerBuilder<TTenant>>();
             var container = await builder.BuildAsync(currentTenant);
+
+            var opts = _serviceProvider.GetService<AdaptedContainerBuilderOptions<TTenant>>();
+            if (opts != null)
+            {
+                opts.OnTenantContainerBuilt(currentTenant, container);
+            }
+
             return container;
         }
     }

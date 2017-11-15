@@ -7,10 +7,9 @@ namespace Dotnettency
     {
         public static MultitenancyMiddlewareOptionsBuilder<TTenant> UsePerTenantContainers<TTenant>(this MultitenancyMiddlewareOptionsBuilder<TTenant> builder)
             where TTenant : class
-        {          
-            builder.ApplicationBuilder.UseMiddleware<TenantContainerMiddleware<TTenant>>();
+        {
+            builder.ApplicationBuilder.UseMiddleware<TenantContainerMiddleware<TTenant>>(builder.ApplicationBuilder);
             return builder;
         }
     }
 }
-

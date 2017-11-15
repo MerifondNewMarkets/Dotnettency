@@ -1,34 +1,30 @@
-﻿using Dotnettency.Container;
-using StructureMap;
+﻿using StructureMap;
 using System;
 using System.Threading.Tasks;
 
-namespace Dotnettency.Container
+namespace Dotnettency.Container.StructureMap
 {
     public class StructureMapTenantContainerBuilder<TTenant> : ITenantContainerBuilder<TTenant>
     {
-        public StructureMapTenantContainerBuilder(IContainer container, Action<TTenant, ConfigurationExpression> configure)
-        {
-            // Ensure.Argument.NotNull(container, nameof(container));
-            // Ensure.Argument.NotNull(configure, nameof(configure));
+        private readonly ITenantContainerAdaptor _parentContainer;
+        private readonly Action<TTenant, ConfigurationExpression> _configureTenant;
 
-            Container = container;
-            Configure = configure;
+        public StructureMapTenantContainerBuilder(ITenantContainerAdaptor parentContainer, Action<TTenant, ConfigurationExpression> configureTenant)
+        {
+            _parentContainer = parentContainer;
+            _configureTenant = configureTenant;
         }
 
-        protected IContainer Container { get; }
-        protected Action<TTenant, ConfigurationExpression> Configure { get; }
-
-        public virtual Task<ITenantContainerAdaptor> BuildAsync(TTenant tenant)
+        public Task<ITenantContainerAdaptor> BuildAsync(TTenant tenant)
         {
-            // Ensure.Argument.NotNull(tenant, nameof(tenant));
+            var tenantContainer = _parentContainer.CreateChildContainer();
 
-            var tenantContainer = Container.CreateChildContainer();
-            tenantContainer.Configure(config => Configure(tenant, config));
-            ITenantContainerAdaptor adaptor = new StructureMapTenantContainerAdaptor(tenantContainer);
-            return Task.FromResult(adaptor);
+            (tenantContainer as StructureMapTenantContainerAdaptor).Configure(config =>
+            {
+                _configureTenant(tenant, config);
+            });
+
+            return Task.FromResult(tenantContainer);
         }
     }
-
-
 }

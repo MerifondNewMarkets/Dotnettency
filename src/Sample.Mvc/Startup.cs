@@ -28,8 +28,7 @@ namespace Sample.Mvc
 
             var serviceProvider = services.AddMultiTenancy<Tenant>((options) =>
             {
-                options
-                    .DistinguishTenantsBySchemeHostnameAndPort() // The distinguisher used to identify one tenant from another.
+                options                   
                     .InitialiseTenant<TenantShellFactory>() // factory class to load tenant when it needs to be initialised for the first time. Can use overload to provide a delegate instead.                    
                     .ConfigureTenantMiddleware((middlewareOptions) =>
                     {
@@ -48,7 +47,7 @@ namespace Sample.Mvc
                     {
                         // Extension methods available here for supported containers. We are using structuremap..
                         // We are using an overload that allows us to configure structuremap with familiar IServiceCollection.
-                        containerBuilder.WithStructureMapServiceCollection((tenant, tenantServices) =>
+                        containerBuilder.WithStructureMap((tenant, tenantServices) =>
                         {
                             // tenantServices.AddSingleton<SomeTenantService>();
                         });

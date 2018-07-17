@@ -33,6 +33,29 @@ namespace Dotnettency.Container
             });
         }
 
+        public ITenantContainerAccessor<TTenant> WithTenant(TenantDistinguisher tenantDistinguisher)
+        {
+            TenantContainer = new Lazy<Task<ITenantContainerAdaptor>>(async () =>
+            {
+                var tenantShell = await _tenantShellAccessor.WithTenant(tenantDistinguisher).CurrentTenantShell.Value;
+
+                if (tenantShell == null)
+                {
+                    return null;
+                }
+
+                var tenant = tenantShell?.Tenant;
+                var lazy = tenantShell.GetOrAddContainer(() =>
+                {
+                    return _containerFactory.Get(tenant);
+                });
+
+                return await lazy.Value;
+            });
+
+            return this;
+        }
+
         public Lazy<Task<ITenantContainerAdaptor>> TenantContainer { get; private set; }
     }
 }

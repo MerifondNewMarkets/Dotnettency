@@ -7,5 +7,6 @@ namespace Dotnettency.Container
         where TTenant : class
     {
         Lazy<Task<ITenantContainerAdaptor>> TenantContainer { get; }
+        ITenantContainerAccessor<TTenant> WithTenant(TenantDistinguisher tenantDistinguisher);
     }
 }

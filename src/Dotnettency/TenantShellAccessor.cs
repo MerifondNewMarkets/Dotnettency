@@ -30,6 +30,15 @@ namespace Dotnettency
             });
         }
 
+        public ITenantShellAccessor<TTenant> WithTenant(TenantDistinguisher tenantDistinguisher)
+        {
+            CurrentTenantShell = new Lazy<Task<TenantShell<TTenant>>>(async () =>
+            {
+                return await _tenantResolver.ResolveTenant(tenantDistinguisher, _tenantFactory);
+            });
+            return this;
+        }
+
         public Lazy<Task<TenantShell<TTenant>>> CurrentTenantShell { get; private set; }
     }
 }

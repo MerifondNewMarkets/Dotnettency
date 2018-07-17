@@ -19,6 +19,12 @@ namespace Dotnettency.Container
             var builder = _serviceProvider.GetRequiredService<ITenantContainerBuilder<TTenant>>();
             var container = await builder.BuildAsync(currentTenant);
 
+            container.Configure(x =>
+            {
+                x.AddSingleton<TTenant>((_) => currentTenant);
+                x.AddSingleton<Task<TTenant>>((_) => Task.FromResult(currentTenant));
+            });
+
             var opts = _serviceProvider.GetService<AdaptedContainerBuilderOptions<TTenant>>();
             if (opts != null)
             {

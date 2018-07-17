@@ -30,6 +30,17 @@ namespace Dotnettency.Container
             });
         }
 
+        public ITenantRequestContainerAccessor<TTenant> WithTenantContainer(ITenantContainerAdaptor tenantContainer)
+        {
+            TenantRequestContainer = new Lazy<Task<PerRequestContainer>>(async () =>
+            {
+                var requestContainer = tenantContainer.CreateNestedContainer(true);
+                return new PerRequestContainer(requestContainer);
+            });
+
+            return this;
+        }
+
         public Lazy<Task<PerRequestContainer>> TenantRequestContainer { get; private set; }
     }
 }

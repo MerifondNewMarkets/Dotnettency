@@ -7,5 +7,6 @@ namespace Dotnettency.Container
         where TTenant : class
     {
         Lazy<Task<PerRequestContainer>> TenantRequestContainer { get; }
+        ITenantRequestContainerAccessor<TTenant> WithTenantContainer(ITenantContainerAdaptor tenantContainer);
     }
 }

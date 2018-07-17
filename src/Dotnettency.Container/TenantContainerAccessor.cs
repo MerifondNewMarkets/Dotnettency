@@ -24,8 +24,7 @@ namespace Dotnettency.Container
                 }
 
                 var tenant = tenantShell?.Tenant;
-                var lazy = tenantShell.GetOrAddContainer(() 
-                    =>
+                var lazy = tenantShell.GetOrAddContainer(() =>
                 {
                     return factory.Get(tenant);
                 });
